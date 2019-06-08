@@ -24,6 +24,25 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class MyMouseContainerWidget extends StatefulWidget{
+	
+	@override
+	MyMouseContainerWidgetState createState() => MyMouseContainerWidgetState();
+	
+}
+
+class MyMouseContainerWidgetState extends State<MyMouseContainerWidget> {
+  @override
+  Widget build(BuildContext context) {
+  	return new Container(
+	    width: 320,
+	    height: 320,
+	    decoration: myBoxDecoration(),
+    );
+  }
+	
+}
+
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   
@@ -47,11 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Container(
-              width: 320,
-              height: 320,
-              decoration: myBoxDecoration(),
-            ),
+            MyMouseContainerWidget(),
             Text(
                 "Your wireless mouse"
             ),
