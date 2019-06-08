@@ -5,9 +5,9 @@ void main() => runApp(MyApp());
 BoxDecoration myBoxDecoration() {
   // It is used to apply border to a widget
   return BoxDecoration(
-      border: Border.all(),
+      border: Border.all(color: Colors.red, width: 10),
       color: Colors.green,
-      borderRadius: BorderRadius.all(Radius.circular(4))
+	  borderRadius: BorderRadius.all(Radius.elliptical(30,30))
   );
 }
 
@@ -48,9 +48,8 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Container(
-              width: 100,
-              height: 100,
-              color: Colors.black,
+              width: 320,
+              height: 320,
               decoration: myBoxDecoration(),
             ),
             Text(
