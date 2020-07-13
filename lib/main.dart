@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:http/http.dart';
 import 'dart:convert';
+import 'package:sensors/sensors.dart';
+
 
 import 'package:flutter/material.dart';
 
@@ -38,6 +41,14 @@ class MyMouseContainerWidget extends StatefulWidget{
 
 class MyMouseContainerWidgetState extends State<MyMouseContainerWidget> {
 	
+	List<double> currentAccelerationXYZ;
+	
+	int randomNoX=0;
+	
+	int randomNoY=0;
+	
+	int randomNoXY=0;
+	
 	Future<HttpClientResponse> makePostRequest(Map<String, dynamic> jsonMap, String path) async {
 //		Map<String, dynamic> jsonMap = {
 //			'homeTeam': {'team': 'Team A'},
@@ -68,22 +79,115 @@ class MyMouseContainerWidgetState extends State<MyMouseContainerWidget> {
 		makePostRequest(data, "/double_tap/");
 	}
 	
+	onHorizontalDragStart(DragStartDetails details) {
+		print("started at" + details.globalPosition.toString());
+	}
+	
+	
+	onHorizontalDragCancel() {
+		print("drag cancel");
+	}
+	
+	onHorizontalDragUpdate(DragUpdateDetails details) {
+		print("2. y:" + details.delta.dy.toString() + "x:" + details.delta.dx.toString());
+		var data = {"event_type": "move_right", "delta_x": (10*(details.delta.dx)).toString()};
+		randomNoX+=1;
+		if (randomNoX%3==0)
+			try
+			{
+				makePostRequest(data, "/move_right/");
+			}
+			catch(Exception)
+			{}
+		
+		
+	}
+	
+	onVerticalDragUpdate(DragUpdateDetails details) {
+		var data = {"event_type": "move_up", "delta_y": (10*(details.delta.dy)).toString()};
+		print("1. y:" + details.delta.dy.toString() + "x:" + details.delta.dx.toString());
+		randomNoY+=1;
+		if (randomNoY%3==0)
+			try{
+				makePostRequest(data, "/move_up/");
+			}
+			catch(Exception)
+			{}
+		
+		
+	}
+	
+	onPanUpdate(DragUpdateDetails details) {
+		var data = {"event_type": "move_cursor",
+			"delta_y": (30*(details.delta.dy)).toString(),
+			"delta_x": (30*(details.delta.dx)).toString()
+		};
+		print("1. y:" + details.delta.dy.toString() + "x:" + details.delta.dx.toString());
+		randomNoXY+=1;
+		if (randomNoXY%5==0)
+			try{
+				makePostRequest(data, "/move_cursor/");
+			}
+			catch(e)
+			{
+				print("error is" +e.toString());
+			}
+	}
+	
+	
 	
 	@override
 	Widget build(BuildContext context) {
+		
+		currentAccelerationXYZ = new List<double>(3);
+		
 		var actualContainer = new Container(
 			width: 320,
 			height: 320,
 			decoration: myBoxDecoration(),
 		);
 		
+		
+		// setMotionListener(); will be used if phone is used as mouse
+		
+		
 		var gestureDetectWrapperWidget = GestureDetector(
 			child: actualContainer,
 			onTap: onTap,
 			onDoubleTap: onDoubleTap,
+//			onHorizontalDragStart: onHorizontalDragStart,
+//			onHorizontalDragCancel: onHorizontalDragCancel,
+//			onHorizontalDragUpdate: onHorizontalDragUpdate,
+//			onVerticalDragUpdate: onVerticalDragUpdate,
+			onPanUpdate: onPanUpdate,
 		);
 		return gestureDetectWrapperWidget;
 	}
+	
+	void setMotionListener() {
+		accelerometerEvents.listen((AccelerometerEvent event) {
+			if  (currentAccelerationXYZ[0]==null)
+			{
+				currentAccelerationXYZ[0] = event.x;
+				currentAccelerationXYZ[1] = event.y;
+				currentAccelerationXYZ[2] = event.z;
+			}
+			
+			else
+			{
+				print(
+					(event.x-currentAccelerationXYZ[0]).toString()+"," +
+						(event.y-currentAccelerationXYZ[1]).toString()+"," +
+						(event.z-currentAccelerationXYZ[2]).toString()
+				);
+			}
+			
+		});
+		
+	}
+	
+	
+	
 	
 }
 
